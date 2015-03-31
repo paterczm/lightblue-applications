@@ -47,11 +47,26 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
 
   function($scope, $http, $rootScope, $log) {
 
-    $rootScope.$watch('submitEvent', function(submitEvent, oldValue) {
+    $scope.editorVisible = false;
 
+    $rootScope.$watch('submitEvent', function(submitEvent, oldValue) {
         if (!$rootScope.submitEvent)
             return;
 
+        $scope.editorVisible = true;
+
+        $scope.loadJson();
+
+        switch ($rootScope.submitEvent.operation) {
+            case 'view':
+                $("#editButtons").hide();
+                break;
+            default:
+                ;
+        }
+    });
+
+    $scope.loadJson = function() {
         $http({method: 'GET', url: "rest-request/"+$rootScope.submitEvent.entity+"/"+$rootScope.submitEvent.version}).
         then(function(response) {
             // TODO: handle error
@@ -59,9 +74,19 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
             var metadata = response.data;
 
             $("#json").val(JSON.stringify(metadata));
-            $("#editor").jsonEditor(metadata, { change: updateJSON, propertyclick: showPath, isEditable: false });
+            $("#editor").jsonEditor(metadata, { change: updateJSON, propertyclick: showPath, isEditable: $rootScope.submitEvent.operation != 'view' });
 
         });
-    });
+    };
+
+    $scope.beautify = function() {
+        var jsonText = $('#json').val();
+        $('#json').val(JSON.stringify(JSON.parse(jsonText), null, 4));
+    };
+
+    $scope.uglify = function() {
+        var jsonText = $('#json').val();
+        $('#json').val(JSON.stringify(JSON.parse(jsonText)));
+    };
 
   }]);

@@ -81,7 +81,7 @@
 
 		<div id="alert-box"></div>       
 
-		<div id="view-jsonEditor" class="view-div" ng-controller="JsonEditorCtrl">
+		<div id="view-jsonEditor" class="view-div" ng-controller="JsonEditorCtrl" ng-show="editorVisible">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
@@ -95,8 +95,8 @@
                             </div>
                             <div id="paste" class="form form-horizontal" role="form">
                                 <textarea id="json" class="form-control json-textarea" rows="10"> </textarea> 
-                                <button id="beautify" class="glyphicon glyphicon-expand btn btn-default btn-lg" title="Expand JSON text"></button> 
-                                <button id="uglify" class="glyphicon glyphicon-collapse-down btn btn-default btn-lg" title="Collapse JSON text"></button>
+                                <button id="beautify" class="glyphicon glyphicon-expand btn btn-default btn-lg" title="Expand JSON text" ng-click="beautify()"></button>
+                                <button id="uglify" class="glyphicon glyphicon-collapse-down btn btn-default btn-lg" title="Collapse JSON text" ng-click="uglify()"></button>
                             </div>
                         </div>
                     </div>
@@ -105,7 +105,7 @@
                     <div class="panel-footer" id="rawJsonButton" style="height: 70px;">
                         <div id="editButtons" style="display: inline-block;">
                             <button id="saveButton" type="button" class="btn btn-default btn-lg">Save</button>
-                            <button id="resetButton" type="button" class="btn btn-default btn-lg">Reset</button>
+                            <button id="resetButton" type="button" class="btn btn-default btn-lg" ng-click="loadJson()">Reset</button>
                         </div>
                         <ul class="nav navbar-nav navbar-right">
                             <li>
