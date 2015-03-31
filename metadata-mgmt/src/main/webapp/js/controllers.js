@@ -42,3 +42,26 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
     }
 
   }]);
+
+metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope', '$log',
+
+  function($scope, $http, $rootScope, $log) {
+
+    $rootScope.$watch('submitEvent', function(submitEvent, oldValue) {
+
+        if (!$rootScope.submitEvent)
+            return;
+
+        $http({method: 'GET', url: "rest-request/"+$rootScope.submitEvent.entity+"/"+$rootScope.submitEvent.version}).
+        then(function(response) {
+            // TODO: handle error
+
+            var metadata = response.data;
+
+            $("#json").val(JSON.stringify(metadata));
+            $("#editor").jsonEditor(metadata, { change: updateJSON, propertyclick: showPath, isEditable: false });
+
+        });
+    });
+
+  }]);
