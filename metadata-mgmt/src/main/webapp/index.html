@@ -50,17 +50,22 @@
 								</select>
 							</div>
 							<div class="form-group">
-								<select id="entities" class="form-control" name="Entity">
+								<select id="entities" class="form-control" name="Entity"
+								    ng-model="entity"
+								    ng-options="entity for entity in entities track by entity"
+								    ng-change="onEntitySelected()">
 									<option value="" disabled="disabled" selected="selected">Entity:</option>
 								</select>
 							</div>
 							<div class="form-group">
-								<select id="versions" class="form-control" name="Version">
+								<select id="versions" class="form-control" name="Version"
+								    ng-model="version">
 									<option value="" disabled="disabled" selected="selected">Version:</option>
+									<option ng-repeat="v in versions" value="{{v.version}}" label="{{v.version}}">{{v.version}}</option>
 								</select>
 							</div>
 							<div class="form-group">
-								<button type="submit" class="btn btn-default" id="load-content-btn" data-loading-text="Loading...">Submit</button>
+								<button type="submit" class="btn btn-default" id="load-content-btn" ng-click="submit()">Submit</button>
 							</div>
 
 						</div>
