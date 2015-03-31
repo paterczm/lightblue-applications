@@ -47,6 +47,8 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
 
   function($scope, $http, $rootScope, $log) {
 
+    var self = this;
+
     $scope.editorVisible = false;
 
     $rootScope.$watch('submitEvent', function(submitEvent, oldValue) {
@@ -55,11 +57,13 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
 
         $scope.editorVisible = true;
 
-        $scope.loadJson();
-
         switch ($rootScope.submitEvent.operation) {
             case 'view':
                 $("#editButtons").hide();
+                $scope.loadJson();
+                break;
+            case 'new':
+                $("#editButtons").show();
                 break;
             default:
                 ;
@@ -76,6 +80,30 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
             $("#json").val(JSON.stringify(metadata));
             $("#editor").jsonEditor(metadata, { change: updateJSON, propertyclick: showPath, isEditable: $rootScope.submitEvent.operation != 'view' });
 
+        });
+    };
+
+    $scope.save = function() {
+        switch ($rootScope.submitEvent.operation) {
+            case 'new':
+                self.createNewEntity();
+                break;
+            default:
+                ;
+        }
+    };
+
+    self.createNewEntity = function() {
+        var json = JSON.parse($("#json").val());
+
+        var entityName = json.schema.name;
+        var entityVersion = json.schema.version.value;
+
+        $http({method: 'PUT', url: "rest-request/"+entityName+"/"+entityVersion, data: json}).
+        then(function(response) {
+            // TODO: handle error
+            // TODO: show success message
+            $log.debug("Successfully created a new entity");
         });
     };
 
