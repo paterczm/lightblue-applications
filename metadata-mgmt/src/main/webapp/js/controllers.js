@@ -8,11 +8,15 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
 
     var self = this;
 
+    $rootScope.isAdmin = $.inArray('lightblue-metadata-admin', window.roles) > -1;
+
+    $scope.operation='view';
+
     $scope.operations = [
-        {'id':'view', 'label':'View Entity'},
-        {'id':'edit', 'label':'Edit Entity'},
-        {'id':'new', 'label':'New Entity'},
-        {'id':'version', 'label':'New Version'}/*,
+        {'id':'view', 'label':'View Entity', 'admin': false},
+        {'id':'edit', 'label':'Edit Entity', 'admin': true},
+        {'id':'new', 'label':'New Entity', 'admin': true},
+        {'id':'version', 'label':'New Version', 'admin': true}/*,
         {'id':'roles', 'label':'View Roles'},
         {'id':'summary', 'label':'View Summary'}*/
         // TODO: implement roles and summary views
