@@ -57,9 +57,9 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
 
   }]);
 
-metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope', '$log', 'MessageService',
+metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope', '$log', 'MessageService', 'LightblueService',
 
-  function($scope, $http, $rootScope, $log, MessageService) {
+  function($scope, $http, $rootScope, $log, MessageService, LightblueService) {
 
     var self = this;
 
@@ -128,10 +128,8 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
         var entityName = json.schema.name;
         var entityVersion = json.schema.version.value;
 
-        $http({method: 'PUT', url: "rest-request/"+entityName+"/"+entityVersion, data: json}).
+        LightblueService.call({method: 'PUT', url: "rest-request/"+entityName+"/"+entityVersion, data: json}).
         then(function(response) {
-            // TODO: handle error
-
             MessageService.showSuccessMessage("Successfully created a new entity");
             $log.debug("Successfully created a new entity");
         });

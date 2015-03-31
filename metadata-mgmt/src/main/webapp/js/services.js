@@ -35,3 +35,35 @@ metadataServices.service('MessageService', ['$log', function($log){
     }
 
 }]);
+
+// Call lightblue with error handling
+// TODO: replace with https://github.com/alechenninger/lightblue.js
+metadataServices.service('LightblueService', ['$http', '$q', 'MessageService', function($http, $q, MessageService){
+
+    var self = this;
+
+    var isLightblueError = function(response) {
+        if (response.data.objectType == "error") {
+            return true;
+        }
+
+        return false;
+    };
+
+    self.call = function(httpOptions) {
+        return $http(httpOptions).
+            then(function(response) {
+                if (isLightblueError(response)) {
+                    MessageService.showLightblueErrorMessage(response.data);
+                    return $q.reject(response.data);
+                }
+
+                return response;
+            }, function(response){
+                MessageService.showErrorMessage("Http status code: "+response.status);
+                $log.error('Server responded with an error: '+JSON.stringify(response));
+                return $q.reject(response.data);
+            });
+    };
+
+}]);
