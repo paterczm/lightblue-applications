@@ -6,6 +6,8 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
 
   function($scope, $http, $rootScope, $log) {
 
+    var self = this;
+
     $scope.operations = [
         {'id':'view', 'label':'View Entity'},
         {'id':'edit', 'label':'Edit Entity'},
@@ -29,7 +31,7 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
         });
     }
 
-    $scope.submit = function() {
+    self.autoSubmit = function() {
         // TODO: form validation
 
         $rootScope.submitEvent = {
@@ -38,8 +40,20 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
                 version: $scope.version
                 };
 
-        $log.debug("Submit: "+JSON.stringify($rootScope.submitEvent));
+        $log.debug("Auto submit: "+JSON.stringify($rootScope.submitEvent));
     }
+
+    $scope.$watch('operation', function() {
+        self.autoSubmit();
+    });
+
+    $scope.$watch('entity', function() {
+        self.autoSubmit();
+    });
+
+    $scope.$watch('version', function() {
+        self.autoSubmit();
+    });
 
   }]);
 
@@ -60,9 +74,15 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
         switch ($rootScope.submitEvent.operation) {
             case 'view':
                 $("#editButtons").hide();
-                $scope.loadJson();
+                self.viewEntity();
                 break;
             case 'new':
+                $("#editButtons").show();
+                break;
+            case 'edit':
+                $("#editButtons").show();
+                break;
+            case 'version':
                 $("#editButtons").show();
                 break;
             default:
@@ -70,7 +90,26 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
         }
     });
 
-    $scope.loadJson = function() {
+    $scope.reset = function() {
+        self.viewEntity();
+    };
+
+    $scope.save = function() {
+        switch ($rootScope.submitEvent.operation) {
+            case 'new':
+                self.createNewEntity();
+                break;
+            case 'edit':
+                self.editEntity();
+                break;
+            case 'version':
+                self.createNewVersion();
+            default:
+                ;
+        }
+    };
+
+    self.viewEntity = function() {
         $http({method: 'GET', url: "rest-request/"+$rootScope.submitEvent.entity+"/"+$rootScope.submitEvent.version}).
         then(function(response) {
             // TODO: handle error
@@ -81,16 +120,6 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
             $("#editor").jsonEditor(metadata, { change: updateJSON, propertyclick: showPath, isEditable: $rootScope.submitEvent.operation != 'view' });
 
         });
-    };
-
-    $scope.save = function() {
-        switch ($rootScope.submitEvent.operation) {
-            case 'new':
-                self.createNewEntity();
-                break;
-            default:
-                ;
-        }
     };
 
     self.createNewEntity = function() {
@@ -104,6 +133,33 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
             // TODO: handle error
             // TODO: show success message
             $log.debug("Successfully created a new entity");
+        });
+    };
+
+    self.editEntity = function() {
+        var json = JSON.parse($("#json").val());
+
+        var entityName = json.entityInfo.name;
+
+        $http({method: 'PUT', url: "rest-request/"+entityName, data: json}).
+        then(function(response) {
+            // TODO: handle error
+            // TODO: show success message
+            $log.debug("Successfully edited entityInfo");
+        });
+    };
+
+    self.createNewVersion = function() {
+        var json = JSON.parse($("#json").val());
+
+        var entityName = json.schema.name;
+        var entityVersion = json.schema.version.value;
+
+        $http({method: 'PUT', url: "rest-request/"+entityName+"/schema="+entityVersion, data: json}).
+        then(function(response) {
+            // TODO: handle error
+            // TODO: show success message
+            $log.debug("Successfully edited entityInfo");
         });
     };
 
