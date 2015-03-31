@@ -63,13 +63,11 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
 
     var self = this;
 
-    $scope.editorVisible = false;
+    $scope.editorVisible = true;
 
     $rootScope.$watch('submitEvent', function(submitEvent, oldValue) {
         if (!$rootScope.submitEvent)
             return;
-
-        $scope.editorVisible = true;
 
         switch ($rootScope.submitEvent.operation) {
             case 'view':
@@ -110,58 +108,74 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
     };
 
     self.viewEntity = function() {
-        $http({method: 'GET', url: "rest-request/"+$rootScope.submitEvent.entity+"/"+$rootScope.submitEvent.version}).
-        then(function(response) {
-            // TODO: handle error
 
-            var metadata = response.data;
+        if ($rootScope.submitEvent && $rootScope.submitEvent.entity && $rootScope.submitEvent.version) {
 
-            $("#json").val(JSON.stringify(metadata));
-            $("#editor").jsonEditor(metadata, { change: updateJSON, propertyclick: showPath, isEditable: $rootScope.submitEvent.operation != 'view' });
+            LightblueService.call({method: 'GET', url: "rest-request/"+$rootScope.submitEvent.entity+"/"+$rootScope.submitEvent.version}).
+            then(function(response) {
+                var metadata = response.data;
 
-        });
+                $("#json").val(JSON.stringify(metadata));
+                $("#editor").jsonEditor(metadata, { change: updateJSON, propertyclick: showPath, isEditable: $rootScope.submitEvent.operation != 'view' });
+
+            });
+        }
     };
 
     self.createNewEntity = function() {
-        var json = JSON.parse($("#json").val());
+        try {
+            var metadata = JSON.parse($("#json").val());
 
-        var entityName = json.schema.name;
-        var entityVersion = json.schema.version.value;
+            var entityName = metadata.schema.name;
+            var entityVersion = metadata.schema.version.value;
 
-        LightblueService.call({method: 'PUT', url: "rest-request/"+entityName+"/"+entityVersion, data: json}).
-        then(function(response) {
-            MessageService.showSuccessMessage("Successfully created a new entity");
-            $log.debug("Successfully created a new entity");
-        });
+            LightblueService.call({method: 'PUT', url: "rest-request/"+entityName+"/"+entityVersion, data: metadata}).
+            then(function(response) {
+                MessageService.showSuccessMessage("Successfully created a new entity");
+                $log.debug("Successfully created a new entity");
+            });
+        } catch (e) {
+            MessageService.showErrorMessage("Could not create lightblue request: "+e);
+        }
     };
 
     self.editEntity = function() {
-        var json = JSON.parse($("#json").val());
+        try {
+            var metadata = JSON.parse($("#json").val());
 
-        var entityName = json.entityInfo.name;
+            var entityName = metadata.entityInfo.name;
+            var entityInfo = metadata.entityInfo;
 
-        $http({method: 'PUT', url: "rest-request/"+entityName, data: json}).
-        then(function(response) {
-            // TODO: handle error
+            LightblueService.call({method: 'PUT', url: "rest-request/"+entityName, data: entityInfo}).
+            then(function(response) {
+                // TODO: handle error
 
-            MessageService.showSuccessMessage("Successfully edited entityInfo");
-            $log.debug("Successfully edited entityInfo");
-        });
+                MessageService.showSuccessMessage("Successfully edited entityInfo");
+                $log.debug("Successfully edited entityInfo");
+            });
+        } catch (e) {
+            MessageService.showErrorMessage("Could not create lightblue request: "+e);
+        }
     };
 
     self.createNewVersion = function() {
-        var json = JSON.parse($("#json").val());
+        try {
+            var metadata = JSON.parse($("#json").val());
 
-        var entityName = json.schema.name;
-        var entityVersion = json.schema.version.value;
+            var entityName = metadata.schema.name;
+            var entityVersion = metadata.schema.version.value;
+            var schema = metadata.schema;
 
-        $http({method: 'PUT', url: "rest-request/"+entityName+"/schema="+entityVersion, data: json}).
-        then(function(response) {
-            // TODO: handle error
+            LightblueService.call({method: 'PUT', url: "rest-request/"+entityName+"/schema="+entityVersion, data: schema}).
+            then(function(response) {
+                // TODO: handle error
 
-            MessageService.showSuccessMessage("Successfully created new version");
-            $log.debug("Successfully created new version");
-        });
+                MessageService.showSuccessMessage("Successfully created new version");
+                $log.debug("Successfully created new version");
+            });
+        } catch (e) {
+            MessageService.showErrorMessage("Could not create lightblue request: "+e);
+        }
     };
 
     $scope.beautify = function() {
