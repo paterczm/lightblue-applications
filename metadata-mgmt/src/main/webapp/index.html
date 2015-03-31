@@ -10,8 +10,9 @@
         </title>
 
         <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
+<!--         <link href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet"> -->
         <link rel="stylesheet" href="css/lightblue-apps.css" type="text/css" />
+
 
         <script src="bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
         <script src="bower_components/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
@@ -34,33 +35,36 @@
             <div class="container-fluid">
                 <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"><span class="sr-only">Toggle navigation</span></button> <a class="navbar-brand" href="#">lightblue Metadata Management</a>
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"><span class="sr-only">Toggle navigation</span></button> <a class="navbar-brand" href="#">Lightblue Metadata Management</a>
                 </div><!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav navbar-left">
                         <li>
-                            <div class="navbar-form" ng-controller="OperationsCtrl">
-                                <div class="form-group">
-                                    <!-- class="ui-widget" -->
+                            <div class="navbar-form form-inline" ng-controller="OperationsCtrl">
 
-                                    <select class="form-control" id="operationSelect" ng-model="operation"
-                                        ng-init="operation = operation || operations[0]"
-                                        ng-options="operation as operation.label for operation in operations track by operation.id" />
+							<div class="form-group">
+								<select class="form-control" id="operationSelect"
+									ng-model="operation"
+									ng-init="operation = operation || operations[0]"
+									ng-options="operation as operation.label for operation in operations track by operation.id">
+								</select>
+							</div>
+							<div class="form-group">
+								<select id="entities" class="form-control" name="Entity">
+									<option value="" disabled="disabled" selected="selected">Entity:</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<select id="versions" class="form-control" name="Version">
+									<option value="" disabled="disabled" selected="selected">Version:</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<button type="submit" class="btn btn-default" id="load-content-btn" data-loading-text="Loading...">Submit</button>
+							</div>
 
-                                    <button id="toggle" class="btn btn-default" style="display:none">Show underlying select</button> <select id="entities" class="form-control" name="Entity">
-                                        <!-- id="combobox2" -->
-                                        <option value="" disabled="disabled" selected="selected">
-                                            Entity:
-                                        </option>
-                                    </select> <button id="toggle" class="btn btn-default" style="display:none">Show underlying select</button> <select id="versions" class="form-control" name="Version">
-                                        <!-- id="combobox3" -->
-                                        <option value="" disabled="disabled" selected="selected">
-                                            Version:
-                                        </option>
-                                    </select> <button id="toggle" class="btn btn-default" style="display:none">Show underlying select</button> <button type="submit" class="btn btn-default" id="load-content-btn" data-loading-text="Loading...">Submit</button>
-                                </div>
-                            </div>
-                        </li>
+						</div>
+					</li>
                     </ul>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
