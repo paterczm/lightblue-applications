@@ -2,9 +2,9 @@
 
 var metadataControllers = angular.module('metadataControllers', ['metadataServices']);
 
-metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope', '$log', 'MessageService',
+metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope', '$log', 'MessageService', 'LightblueService',
 
-  function($scope, $http, $rootScope, $log, MessageService) {
+  function($scope, $http, $rootScope, $log, MessageService, LightblueService) {
 
     var self = this;
 
@@ -17,19 +17,28 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
         {'id':'summary', 'label':'View Summary'}
     ];
 
-    $http({method: 'GET', url: "rest-request/"}).
-        then(function(response) {
-            // TODO: handle error
-            $scope.entities = response.data.entities;
-        });
-
     $scope.onEntitySelected = function() {
-        $http({method: 'GET', url: "rest-request/"+$scope.entity}).
-        then(function(response) {
-            // TODO: handle error
-            $scope.versions = response.data;
-        });
-    }
+        self.loadVersions();
+    };
+
+    self.loadEntities = function() {
+        return LightblueService.call({method: 'GET', url: "rest-request/"}).
+            then(function(response) {
+                $scope.entities = response.data.entities;
+                delete $scope.entity;
+                delete $scope.version;
+                delete $scope.versions;
+            });
+    };
+
+    self.loadEntities();
+
+    self.loadVersions = function() {
+        return LightblueService.call({method: 'GET', url: "rest-request/"+$scope.entity}).
+            then(function(response) {
+                $scope.versions = response.data;
+            });
+    };
 
     self.autoSubmit = function() {
         // TODO: form validation
@@ -41,7 +50,16 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
                 };
 
         $log.debug("Auto submit: "+JSON.stringify($rootScope.submitEvent));
-    }
+    };
+
+    $rootScope.$watch('forceReload', function(forceReload, previousForceReload) {
+       if (forceReload == true && previousForceReload != true) {
+           $rootScope.forceReload = false;
+
+           $log.debug("Reloading entities");
+           self.loadEntities();
+       }
+    });
 
     $scope.$watch('operation', function() {
         self.autoSubmit();
@@ -117,7 +135,6 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
 
                 $("#json").val(JSON.stringify(metadata));
                 $("#editor").jsonEditor(metadata, { change: updateJSON, propertyclick: showPath, isEditable: $rootScope.submitEvent.operation != 'view' });
-
             });
         }
     };
@@ -126,13 +143,15 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
         try {
             var metadata = JSON.parse($("#json").val());
 
-            var entityName = metadata.schema.name;
+            var entityName = metadata.entityInfo.name;
             var entityVersion = metadata.schema.version.value;
 
             LightblueService.call({method: 'PUT', url: "rest-request/"+entityName+"/"+entityVersion, data: metadata}).
             then(function(response) {
                 MessageService.showSuccessMessage("Successfully created a new entity");
                 $log.debug("Successfully created a new entity");
+                // Reload data in OperationsCtrl
+                $rootScope.forceReload = true;
             });
         } catch (e) {
             MessageService.showErrorMessage("Could not create lightblue request: "+e);
@@ -148,8 +167,6 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
 
             LightblueService.call({method: 'PUT', url: "rest-request/"+entityName, data: entityInfo}).
             then(function(response) {
-                // TODO: handle error
-
                 MessageService.showSuccessMessage("Successfully edited entityInfo");
                 $log.debug("Successfully edited entityInfo");
             });
@@ -168,10 +185,11 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
 
             LightblueService.call({method: 'PUT', url: "rest-request/"+entityName+"/schema="+entityVersion, data: schema}).
             then(function(response) {
-                // TODO: handle error
-
                 MessageService.showSuccessMessage("Successfully created new version");
                 $log.debug("Successfully created new version");
+
+                // Reload data in OperationsCtrl
+                $rootScope.forceReload = true;
             });
         } catch (e) {
             MessageService.showErrorMessage("Could not create lightblue request: "+e);
