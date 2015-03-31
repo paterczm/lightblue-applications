@@ -1,10 +1,10 @@
 "use strict";
 
-var metadataControllers = angular.module('metadataControllers', []);
+var metadataControllers = angular.module('metadataControllers', ['metadataServices']);
 
-metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope', '$log',
+metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope', '$log', 'MessageService',
 
-  function($scope, $http, $rootScope, $log) {
+  function($scope, $http, $rootScope, $log, MessageService) {
 
     var self = this;
 
@@ -57,9 +57,9 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
 
   }]);
 
-metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope', '$log',
+metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope', '$log', 'MessageService',
 
-  function($scope, $http, $rootScope, $log) {
+  function($scope, $http, $rootScope, $log, MessageService) {
 
     var self = this;
 
@@ -131,7 +131,8 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
         $http({method: 'PUT', url: "rest-request/"+entityName+"/"+entityVersion, data: json}).
         then(function(response) {
             // TODO: handle error
-            // TODO: show success message
+
+            MessageService.showSuccessMessage("Successfully created a new entity");
             $log.debug("Successfully created a new entity");
         });
     };
@@ -144,7 +145,8 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
         $http({method: 'PUT', url: "rest-request/"+entityName, data: json}).
         then(function(response) {
             // TODO: handle error
-            // TODO: show success message
+
+            MessageService.showSuccessMessage("Successfully edited entityInfo");
             $log.debug("Successfully edited entityInfo");
         });
     };
@@ -158,8 +160,9 @@ metadataControllers.controller('JsonEditorCtrl', ['$scope', '$http', '$rootScope
         $http({method: 'PUT', url: "rest-request/"+entityName+"/schema="+entityVersion, data: json}).
         then(function(response) {
             // TODO: handle error
-            // TODO: show success message
-            $log.debug("Successfully edited entityInfo");
+
+            MessageService.showSuccessMessage("Successfully created new version");
+            $log.debug("Successfully created new version");
         });
     };
 
