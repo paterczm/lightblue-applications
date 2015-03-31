@@ -12,6 +12,8 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
 
     $scope.operation='view';
 
+    $scope.showVersionSelect = true;
+
     $scope.operations = [
         {'id':'view', 'label':'View Entity', 'admin': false},
         {'id':'edit', 'label':'Edit Entity', 'admin': true},
@@ -50,7 +52,7 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
     self.autoSubmit = function() {
 
         $rootScope.submitEvent = {
-                operation: $scope.operation.id,
+                operation: $scope.operation,
                 entity: $scope.entity,
                 version: $scope.version
                 };
@@ -70,27 +72,26 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
     $scope.$watch('operation', function() {
 
         // control visibility depending on the operation
-        // seems easier to do in jQuery
-        switch ($scope.operation.id) {
+        switch ($scope.operation) {
             case 'view':
                 $("#editButtons").hide();
-                $("#versionSelect").show();
+                $scope.showVersionSelect = true;
                 $scope.operationDesc = "View entityInfo and schema. This is read only operation.";
                 break;
             case 'new':
                 $("#editButtons").show();
-                $("#versionSelect").hide();
+                $scope.showVersionSelect = false;
                 $scope.operationDesc = "Create new entity. You need to define both entityInfo and schema.";
                 break;
             case 'edit':
                 $("#editButtons").show();
-                $("#versionSelect").hide();
+                $scope.showVersionSelect = false;
                 $scope.operationDesc = "Edit entity. This operation allows you to modify entityInfo.";
                 break;
             case 'version':
                 $("#editButtons").show();
-                $("#versionSelect").hide();
-                $scope.operationDesc = "Create new version. This operation allows you to define new schema version for existing entity";
+                $scope.showVersionSelect = false;
+                $scope.operationDesc = "Create new version. This operation allows you to define new schema version for existing entity.";
                 break;
             default:
                 ;

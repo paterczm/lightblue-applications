@@ -50,7 +50,7 @@
 							</div>
 							<div class="form-group">
 								<select id="versionSelect" class="form-control"
-								    ng-model="version">
+								    ng-model="version" ng-show="showVersionSelect">
 									<option value="" disabled="disabled" selected="selected">Version:</option>
 									<option ng-repeat="v in versions" value="{{v.version}}" label="{{v.version}}">{{v.version}}</option>
 								</select>
