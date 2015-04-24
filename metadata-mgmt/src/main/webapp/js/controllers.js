@@ -8,7 +8,7 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
 
     var self = this;
 
-    $rootScope.isAdmin = $.inArray('lightblue-metadata-admin', window.roles) > -1;
+    $rootScope.isAdmin = $.inArray('lb-metadata-admin', window.roles) > -1;
 
     $scope.operation='view';
 
