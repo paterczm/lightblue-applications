@@ -43,7 +43,12 @@ metadataControllers.controller('OperationsCtrl', ['$scope', '$http', '$rootScope
     self.loadVersions = function() {
         return LightblueService.call({method: 'GET', url: "rest-request/"+$scope.entity}).
             then(function(response) {
-                $scope.versions = response.data.sort(function(v1, v2) {
+
+                var activeVersions = response.data.filter(function(ver) {
+                    return ver.status == "active";
+                });
+
+                $scope.versions = activeVersions.sort(function(v1, v2) {
                     return v1.version.localeCompare(v2.version);
                 });
             });
