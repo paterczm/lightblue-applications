@@ -38,7 +38,7 @@ metadataServices.service('MessageService', ['$log', function($log){
 
 // Call lightblue with error handling
 // TODO: replace with https://github.com/alechenninger/lightblue.js
-metadataServices.service('LightblueService', ['$http', '$q', 'MessageService', function($http, $q, MessageService){
+metadataServices.service('LightblueService', ['$http', '$q', 'MessageService', '$log', function($http, $q, MessageService, $log){
 
     var self = this;
 
